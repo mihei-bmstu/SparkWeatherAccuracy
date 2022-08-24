@@ -8,6 +8,7 @@ object Properties {
   val urlPG = "jdbc:postgresql://localhost:5432/weather"
   val tablePGOb = "moscow_ob"
   val tablePGFor = "moscow_for"
+  val tablePGDiff = "moscow_diff"
 
   val propertiesPG = new Properties()
   propertiesPG.setProperty("user", userPG)
