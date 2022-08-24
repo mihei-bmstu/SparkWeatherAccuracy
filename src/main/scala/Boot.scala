@@ -10,7 +10,7 @@ object Boot {
     Logger.getLogger("com").setLevel(Level.ERROR)
 
     val spark = SparkSession.builder()
-      .master("local")
+      .master("spark://spark:7077")
       .appName("WeatherAccuracy")
       .getOrCreate()
 
@@ -18,9 +18,13 @@ object Boot {
 
     val DFOb = spark.read
       .jdbc(Properties.urlPG, Properties.tablePGOb, Properties.propertiesPG)
+      .dropDuplicates()
 
     val DFFor = spark.read
       .jdbc(Properties.urlPG, Properties.tablePGFor, Properties.propertiesPG)
+      .dropDuplicates()
+
+    DFFor.show(truncate = false)
 
     val DFJoined = DFFor.as("forecast")
       .join(DFOb.as("observed"), "datetimeiso")
@@ -32,6 +36,8 @@ object Boot {
 
     DFJoined.show()
 
-    DFJoined.write.jdbc(Properties.urlPG, Properties.tablePGDiff, Properties.propertiesPG)
+    DFJoined.write
+      .mode("overwrite")
+      .jdbc(Properties.urlPG, Properties.tablePGDiff, Properties.propertiesPG)
   }
 }
